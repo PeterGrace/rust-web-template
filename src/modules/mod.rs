@@ -42,13 +42,13 @@ pub(crate) struct AppAPIResponse {
     data: Option<Value>
 }
 impl AppAPIResponse {
-    fn message<S: Into<String>>(msg: S) -> Self {
+    pub fn message<S: Into<String>>(msg: S) -> Self {
         Self {
             message: msg.into(),
             data: None,
         }
     }
-    fn data<S: Into<String>,D: Into<Value>>(msg: S, data: D) -> Self {
+    pub fn data<S: Into<String>,D: Into<Value>>(msg: S, data: D) -> Self {
         Self {
             message: msg.into(),
             data: Some(data.into()),

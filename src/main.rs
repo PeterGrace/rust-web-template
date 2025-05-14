@@ -11,6 +11,7 @@ extern crate tracing;
 extern crate metrics;
 
 use console_subscriber as tokio_console_subscriber;
+use axum::routing::get;
 use metrics::Recorder;
 use metrics_exporter_prometheus::PrometheusBuilder;
 use metrics_util::layers::{Prefix, Stack};
@@ -43,6 +44,13 @@ use crate::auth::token_extractor::JwksCache;
 use tower_sessions::cookie::time::Duration as CookieDuration;
 use crate::auth::token_middleware::auth_middleware;
 use crate::modules::users::user_routes;
+use tokio::sync::OnceCell;
+use lazy_static::lazy_static;
+
+lazy_static!{
+    pub static ref API_DOC: OnceCell<utoipa::openapi::OpenApi> = OnceCell::new();
+}
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -157,21 +165,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         auth_middleware,
     );
 
-    let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
-        .nest(&format!("{API_VER}/{USERS_TAG}"),user_routes(state.clone()))
+    let api = ApiDoc::openapi();
+
+    let public_routes = OpenApiRouter::new()
         .merge(register_routes(state.clone()))
-        .layer(auth_layer)
+        .route(API_PATH, get(openapi));
+
+    let protected_routes = OpenApiRouter::<AppState>::new()
+        .nest(&format!("{API_VER}/{USERS_TAG}"),user_routes(state.clone()))
+        .layer(auth_layer);
+
+    let (router, api) = OpenApiRouter::with_openapi(api)
+        .merge(public_routes)
+        .merge(protected_routes)
         .layer(cors_layer)
         .layer(session_layer)
         .with_state(state)
         .split_for_parts();
 
-    let router = router.merge(Scalar::with_url("/scalar", api));
+    let app = router.merge(Scalar::with_url(SCALAR_PATH, api.clone()));
+    if let Err(e) = API_DOC.set(api) {
+        error!("Couldn't store api into document variable: {e}");
+    }
 
     let listener = TcpListener::bind((Ipv6Addr::LOCALHOST, 8080))
         .await
         .expect("Failed to bind");
-    let _ = axum::serve(listener, router).await;
+    let _ = axum::serve(listener, app).await;
     //endregion
     Ok(())
 }

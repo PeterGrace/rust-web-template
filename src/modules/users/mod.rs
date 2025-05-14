@@ -11,7 +11,7 @@ use tower_sessions::Session;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use crate::modules::{Authorizable, AuthorizableType, AppAPIResponse, RBAC};
-use crate::routes::USERS_TAG;
+use crate::consts::*;
 
 pub(crate) fn user_routes(state: AppState) -> OpenApiRouter<AppState> {
    OpenApiRouter::new()
