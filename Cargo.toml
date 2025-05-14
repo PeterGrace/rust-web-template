@@ -1,0 +1,35 @@
+[package]
+name = "{{project-name}}"
+#name = "name"
+version = "0.1.0"
+edition = "2024"
+authors = ["{{authors}}"]
+
+[dependencies]
+ctrlc = { version = "3.4.5", features = ["termination"] }
+lazy_static = "1.5.0"
+serde = { version = "1.0.216", features = ["derive"] }
+thiserror = "2.0.6"
+tokio = { version = "1.42.0", features = ["rt-multi-thread", "macros", "time", "tracing", "sync"] }
+tracing = "0.1.41"
+tracing-log = "0.2.0"
+tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
+metrics = { version = "0.24.2" }
+metrics-exporter-prometheus = "0.17.0"
+metrics-util = "0.19.1"
+utoipa = { version = "5.3.1", features = ["macros","chrono","axum_extras"] }
+openssl = {  version = "0.10.72", features=["vendored"] }
+axum = { version = "0.8.4", features = ["http2", "macros"] }
+utoipa-axum = "0.2.0"
+utoipa-scalar = { version = "0.3.0", features = ["axum"] }
+console-subscriber = "0.4.1"
+cached = { version = "0.55.1", features = ["redis_tokio","async", "redis_store"] }
+sqlx = { version = "0.8.2",features = ["postgres","runtime-tokio-native-tls","any","chrono"] }
+tower = "0.5.2"
+tower-http = { version = "0.6.2",features = ["cors"] }
+tower-sessions = "0.14.0"
+jsonwebtoken = "9.3.1"
+async-trait = "0.1.86"
+serde_json = "1.0.139"
+reqwest = { version = "0.12.14", features = ["json"] }
+dotenv = "0.15.0"

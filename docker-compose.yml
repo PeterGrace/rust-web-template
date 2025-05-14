@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis
+    restart: unless-stopped
+    ports: 
+      - 6379:6379
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: flower_backend
+      POSTGRES_PASSWORD: flower_backend
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 55432:5432
+
+volumes:
+  pgdata:
