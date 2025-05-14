@@ -8,8 +8,8 @@ services:
     image: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: flower_backend
-      POSTGRES_PASSWORD: flower_backend
+      POSTGRES_USER: app_name
+      POSTGRES_PASSWORD: app_password
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
